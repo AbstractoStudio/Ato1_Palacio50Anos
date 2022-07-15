@@ -1,0 +1,95 @@
+// Daniel Shiffman
+// http://codingtra.in
+// http://patreon.com/codingtrain
+// Code for: https://youtu.be/o1Ob28sF0N8
+
+class Blob {
+  float minx;
+  float miny;
+  float maxx;
+  float maxy;
+
+  int id = 0;
+
+  int lifespan = maxLife;
+
+  boolean taken = false;
+
+  Blob(float x, float y) {
+    minx = x;
+    miny = y;
+    maxx = x;
+    maxy = y;
+  }
+
+  boolean checkLife() {
+    lifespan--; 
+    if (lifespan < 0) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+
+  void show(PGraphics img) {
+    //println(id,getCenter());
+    img.stroke(0,205,0);
+    //img.fill(255, lifespan);
+    img.noFill();
+    img.strokeWeight(2);
+    img.rectMode(CORNERS);
+    img.rect(minx, miny, maxx, maxy);
+
+    img.textAlign(CENTER,CENTER);
+    img.textSize(24);
+    img.fill(0,205,0);
+    img.text(id, minx + (maxx-minx)*0.5, maxy  - (maxy-miny)*0.5);
+    img.textSize(18);
+    img.fill(255,0,0);
+    img.text("life: "+str(lifespan), minx + (maxx-minx)*0.5, miny - 10);
+  }
+
+
+  void add(float x, float y) {
+    minx = min(minx, x);
+    miny = min(miny, y);
+    maxx = max(maxx, x);
+    maxy = max(maxy, y);
+  }
+
+  void become(Blob other) {
+    minx = other.minx;
+    maxx = other.maxx;
+    miny = other.miny;
+    maxy = other.maxy;
+    //lifespan = maxLife;
+  }
+
+  float size() {
+    return (maxx-minx)*(maxy-miny);
+  }
+
+  PVector getCenter() {
+    float x = (maxx - minx)* 0.5 + minx;
+    float y = (maxy - miny)* 0.5 + miny;    
+    return new PVector(x, y);
+  }
+
+  boolean isNear(float x, float y) {
+
+    float cx = max(min(x, maxx), minx);
+    float cy = max(min(y, maxy), miny);
+    float d = distSq(cx, cy, x, y);
+
+    if (d < distThreshold*distThreshold) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  
+  void sendOsc(){
+    sendBlobOsc(id,getCenter().x/width,1-getCenter().y/height);
+  }
+}
